@@ -50,6 +50,28 @@ const getNearbyWarehouses = asyncWrapper(async (req, res) => {
   res.status(StatusCodes.OK).json({ warehouses: nearbyWarehouses });
 });
 
+const filterWarehousesByRating = asyncWrapper(async (req, res) => {
+    const { minRating = 0, maxRating = 5 } = req.query;
+
+    const warehouses = await db.Users.findAll({
+        where: {
+            userType: "warehouse",
+            rating: {
+                [db.Sequelize.Op.gte]: minRating,
+                [db.Sequelize.Op.lte]: maxRating,
+            },
+        },
+        attributes: ["id", "firstname", "lastname", "rating", "email"],
+        order: [["rating", "DESC"]],
+    });
+
+    if (!warehouses || warehouses.length === 0) {
+        throw new NotFoundError("No warehouses found with the given rating filter");
+    }
+
+    return res.status(StatusCodes.OK).json({ warehouses });
+});
 module.exports = {
   getNearbyWarehouses,
+  filterWarehousesByRating
 };

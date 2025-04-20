@@ -34,19 +34,32 @@ const addToCart = asyncWrapper(async (req, res) => {
         throw new NotFoundError('Product not found');
     };
     
+    if (quantity > product.stock) {
+        throw new BadRequestError(`Only ${product.stock} items in stock`);
+    }
+
     let cart = await db.Cart.findOne({
         where: { userId },
         include: [
             {
                 model: db.CartItem,
                 as: 'cartItems',
-                include: [{ model: db.Product, as: 'product' }],
+                include: [{ model: db.Product, as: 'product',attributes: ['id', 'name', 'image', 'category', 'price', 'warehouseId'], }],
             },
         ],
     });
     if (!cart) {
         cart = await db.Cart.create({ userId });
+    } else {
+        const cartItems = cart.cartItems;
+        if ( cartItems.length > 0) {
+            const existingWarehouseId = cartItems[0].product.warehouseId;
+            if (product.warehouseId !== existingWarehouseId) {
+                throw new BadRequestError('You can only add products from the same warehouse to the cart');
+            }
+        }
     }
+
 
     const [cartItem, created] = await db.CartItem.findOrCreate({
         where: { cartId: cart.id, productId, size: size ?? null, color : color ?? null },
@@ -67,6 +80,9 @@ const updateCartItem = asyncWrapper(async (req, res) => {
     const cartItem = await db.CartItem.findByPk(cartItemId);
     if (!cartItem) {
         throw new NotFoundError('Cart item not found');
+    }
+    if (quantity <= 0 || quantity > cartItem.product.stock) {
+        throw new BadRequestError('Invalid quantity');
     }
     cartItem.quantity = quantity;
     await cartItem.save();
