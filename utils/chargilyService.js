@@ -7,10 +7,8 @@ const client = new ChargilyClient({
 });
 
 const createPayment = async ({
-  amount,
   email,
   name,
-  method,
   orderId,
   items,
   phone,
@@ -56,7 +54,6 @@ const createPayment = async ({
     items: checkoutItems,
     success_url: `${process.env.BASE_URL}/payment/success`,
     failure_url: `${process.env.BASE_URL}/payment/failure`,
-    payment_method: method.toLowerCase(), // edahabia / cib
     customer_id: customer.id,
     metadata: { order_id: orderId },
     collect_shipping_address: true,

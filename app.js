@@ -44,6 +44,8 @@ const productReviewsRouter = require('./routes/productReviews');
 const warehouseReviewsRouter = require('./routes/warehouseReviews');
 const trackingWarehouseRouter = require('./routes/tracking');
 const chargilyRoutes = require('./routes/chargily');
+const filteringRouter = require('./routes/filtering');
+const adminRouter = require('./routes/admin');
 
 //
 app.use(cookieParser());
@@ -52,7 +54,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use('/webhook', authentication, chargilyRoutes);
+app.use('/webhook', chargilyRoutes);
 app.use(express.json());
 //routes
 app.use('/products', productsRouter);
@@ -64,7 +66,8 @@ app.use('/dashboard', dashboardRouter);
 app.use('/productReviews', productReviewsRouter);
 app.use('/warehouseReviews', warehouseReviewsRouter);
 app.use('/tracking', trackingWarehouseRouter);
-
+app.use('/filtering', filteringRouter);
+app.use('/admin', adminRouter);
 
 //image access 
 app.use('/uploads', express.static('uploads'));
