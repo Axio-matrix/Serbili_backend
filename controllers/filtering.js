@@ -11,7 +11,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const getNearbyWarehouses = asyncWrapper(async (req, res) => {
   const { radius = 20 } = req.query; // radius in km
-  const { latitude: shopLat, longitude: shopLng, } = req.user; // Assuming the shop's location is stored in the user object
+  const { latitude: shopLat, longitude: shopLng } = req.user; // Assuming the shop's location is stored in the user object
   if (!shopLat || !shopLng) {
     throw new BadRequestError(
       "Shop location (latitude and longitude) is required"
@@ -24,7 +24,7 @@ const getNearbyWarehouses = asyncWrapper(async (req, res) => {
       latitude: { [db.Sequelize.Op.ne]: null },
       longitude: { [db.Sequelize.Op.ne]: null },
     },
-  });  
+  });
   const haversine = (lat1, lon1, lat2, lon2) => {
     const toRad = (value) => (value * Math.PI) / 180;
     const R = 6371; // km
@@ -51,27 +51,41 @@ const getNearbyWarehouses = asyncWrapper(async (req, res) => {
 });
 
 const filterWarehousesByRating = asyncWrapper(async (req, res) => {
-    const { minRating = 0, maxRating = 5 } = req.query;
+  const { minRating = 0, maxRating = 5 } = req.query;
 
-    const warehouses = await db.Users.findAll({
-        where: {
-            userType: "warehouse",
-            rating: {
-                [db.Sequelize.Op.gte]: minRating,
-                [db.Sequelize.Op.lte]: maxRating,
-            },
-        },
-        attributes: ["id", "firstname", "lastname", "rating", "email"],
-        order: [["rating", "DESC"]],
-    });
+  const warehouses = await db.Users.findAll({
+    where: {
+      userType: "warehouse",
+      rating: {
+        [db.Sequelize.Op.gte]: minRating,
+        [db.Sequelize.Op.lte]: maxRating,
+      },
+    },
+    attributes: ["id", "firstname", "lastname", "rating", "email"],
+    order: [["rating", "DESC"]],
+  });
 
-    if (!warehouses || warehouses.length === 0) {
-        throw new NotFoundError("No warehouses found with the given rating filter");
-    }
+  if (!warehouses || warehouses.length === 0) {
+    throw new NotFoundError("No warehouses found with the given rating filter");
+  }
 
-    return res.status(StatusCodes.OK).json({ warehouses });
+  return res.status(StatusCodes.OK).json({ warehouses });
 });
+
+const getAllwarehouses = asyncWrapper(async (req, res) => {
+  const warehouses = await db.Users.findAll({
+    where: { userType: "warehouse" },
+  });
+
+  if (!warehouses || warehouses.length === 0) {
+    throw new NotFoundError("No warehouses found");
+  }
+
+  return res.status(StatusCodes.OK).json({ warehouses });
+});
+
 module.exports = {
   getNearbyWarehouses,
-  filterWarehousesByRating
+  filterWarehousesByRating,
+  getAllwarehouses
 };
