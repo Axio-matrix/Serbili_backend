@@ -3,12 +3,13 @@ const { BadRequestError, UnauthenticatedError,ForbiddenError , NotFoundError} = 
 require('dotenv').config();
 const asyncWrapper = require("../middlewares/async");
 const { StatusCodes } = require('http-status-codes');
-const {saveBase64Image} = require("../utils/saveBase64Image");
+
+
+//get all products raha admin yjib kol l products w shop yjib l products ta3 same category
 
 const getAllProducts = asyncWrapper(async (req, res) => {
-    const whereClause = req.user.userType === 'admin' ? {} : { category: req.user.category };
     const products = await db.Product.findAll({
-        where: whereClause,
+        where: { category: req.user.category },
     });
     
     if (!products) {
@@ -25,6 +26,7 @@ const getProduct = asyncWrapper(async (req, res) => {
     }
     return res.status(StatusCodes.OK).json({product})
 })
+//hadi ta3 l warehouses , getALlProducts by warehouseId
 const getProductsByWarehouse = asyncWrapper(async (req, res) => {
     const { id: warehouseId } = req.user;
     const products = await db.Product.findAll({ where: { warehouseId } });
@@ -40,8 +42,8 @@ const createProduct = asyncWrapper(async (req, res) => {
   if (!name || !price || !stock || !description || !category || !imageBase64  ) {
     throw new BadRequestError("Please fill all fields");
   }
-  const imagePath = await saveBase64Image(imageBase64, "image", "product_image");
-  const product = await db.Product.create({ name, price, stock,description, category, image:imagePath , warehouseId});
+//   const imagePath = await saveBase64Image(imageBase64, "image", "product_image");
+  const product = await db.Product.create({ name, price, stock,description, category, image:imageBase64 , warehouseId});
   return res.status(StatusCodes.CREATED).json({ product });
 });
 

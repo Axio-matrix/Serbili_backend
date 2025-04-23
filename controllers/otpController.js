@@ -26,7 +26,7 @@ const verifyOTP = asyncWrapper(async (req, res) => {
     const accessToken = await user.generateAccessToken();
     
     const refreshToken = await db.refreshToken.generateToken(user.id) 
-    res.cookie('accessToken', accessToken, {
+    res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', 
         sameSite: 'Strict',
@@ -36,7 +36,7 @@ const verifyOTP = asyncWrapper(async (req, res) => {
     
     return res.status(200).json({
         msg: 'OTP verified successfully',
-        refreshToken: refreshToken.token,
+        accessToken,
     });
 
 });

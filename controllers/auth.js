@@ -9,7 +9,7 @@ const asyncWrapper = require("../middlewares/async");
 const bcrypt = require('bcrypt');
 const { sendOTP } = require("../utils/OtpVerification");
 const { StatusCodes } = require("http-status-codes");
-const {saveBase64Image} = require("../utils/saveBase64Image");
+// const {saveBase64Image} = require("../utils/saveBase64Image");
 require("dotenv").config();
 
 
@@ -36,7 +36,7 @@ const refreshToken = asyncWrapper(async (req, res) => {
   //generate the new access token
   const newAccessToken = await user.generateAccessToken();
   //generate the new refresh token
-  res.cookie('accessToken', newAccessToken, {
+  res.cookie('refreshToken', storedToken.token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'Strict',
@@ -44,6 +44,7 @@ const refreshToken = asyncWrapper(async (req, res) => {
   });
   return res.status(200).json({
     msg: "Token refreshed successfully",
+    accessToken: newAccessToken,
   });
 });
 const register = asyncWrapper(async (req, res) => {
@@ -63,7 +64,7 @@ const register = asyncWrapper(async (req, res) => {
     throw new BadRequestError("Please fill all fields");
   }
   //image path
-  const imagePath = await saveBase64Image(paperBase64 , "paper", "user_paper");
+  // const imagePath = await saveBase64Image(paperBase64 , "paper", "user_paper");
   const user = await db.Users.create({
     firstname,
     lastname,
@@ -73,7 +74,7 @@ const register = asyncWrapper(async (req, res) => {
     userType,
     category,
     isVerified: false,
-    paper: imagePath,
+    paper: paperBase64,
   });
 
   await sendOTP(user);
@@ -106,7 +107,7 @@ const login = asyncWrapper(async (req, res) => {
   }
   const accessToken = await user.generateAccessToken();
   const refreshToken = await db.refreshToken.generateToken(user.id);
-  res.cookie("accessToken", accessToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // Use secure cookies in production
     sameSite: "Strict",
@@ -116,7 +117,7 @@ const login = asyncWrapper(async (req, res) => {
   return res.status(200).json({
     message: "User logged in successfully",
     user,
-    refreshToken: refreshToken.token,
+    accessToken
   });
 });
 

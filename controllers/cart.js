@@ -6,7 +6,6 @@ const { StatusCodes } = require('http-status-codes');
 
 const getCart = asyncWrapper(async (req, res) => {
     const { id: userId } = req.user; 
-    console.log('the userId', userId);
     
     let cart = await db.Cart.findOne({
       where: { userId },
@@ -14,7 +13,13 @@ const getCart = asyncWrapper(async (req, res) => {
         {
           model: db.CartItem,
           as: "cartItems",
-          include: [{ model: db.Product, as: "product" }],
+          include: [
+            {
+              model: db.Product,
+              as: "product",
+              attributes: ['id', 'name', 'price', 'image', 'category', 'description', 'rating'], // Specify desired attributes here
+            },
+          ],
         },
       ],
     });
