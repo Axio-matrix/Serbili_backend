@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
 const cookieParser = require("cookie-parser");
-const {sequelize} = require('sequelize');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 // Socket.io
 const http = require('http');
 const server = http.createServer(app);
@@ -29,7 +32,6 @@ io.on('connection', (socket) => {
 });
 app.set('io', io);
 require('dotenv').config();
-const cors = require('cors');
 //middlewares
 const errorHandlerMiddleware = require('./middlewares/error-handelr');
 const notFound = require('./middlewares/notFound-error')
@@ -48,6 +50,13 @@ const filteringRouter = require('./routes/filtering');
 const adminRouter = require('./routes/admin');
 
 //
+app.use(helmet()); // Adds secure headers
+app.use(xss()); // Cleans user input
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+}));
 app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.urlencoded({
