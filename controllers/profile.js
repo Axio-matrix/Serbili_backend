@@ -83,14 +83,14 @@ const uploadProfileImage = asyncWrapper(async (req, res) => {
 
 const updateProfile = asyncWrapper(async (req, res) => {
     const { id: userId } = req.user;
-    const { firstname, lastname, email, phoneNumber, address, emergencyContact, category } = req.body;
+    const { firstname, lastname, email, phoneNumber, address, emergencyContact, category , latitude , longitude } = req.body;
 
     const user = await db.Users.findByPk(userId);
     if (!user) {
         throw new NotFoundError('User not found');
     }
 
-    await user.update({ firstname, lastname, email, phoneNumber, address, emergencyContact, category });
+    await user.update({ firstname, lastname, email, phoneNumber, address, emergencyContact, category, latitude , longitude });
 
     return res.status(StatusCodes.OK).json({ message: 'Profile updated successfully' });
 });
