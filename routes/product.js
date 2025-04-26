@@ -7,6 +7,7 @@ const {
   updateProduct,
   deleteProduct,
   getProductsByWarehouse,
+  getProductsByWarehouseForShops
 } = require("../controllers/product");
 const authentication = require("../middlewares/authentication");
 const authorizeRoles = require("../middlewares/authorizeRoles");
@@ -25,5 +26,10 @@ router
   .get(authentication, authorizeRoles("shop", "warehouse", "admin"), getProduct)
   .patch(...auths, updateProduct)
   .delete(...auths, deleteProduct);
+router.route("/warehouse/:id").get(
+  authentication,
+  authorizeRoles("shop", "admin"),
+  getProductsByWarehouseForShops
+);
 
 module.exports = router;

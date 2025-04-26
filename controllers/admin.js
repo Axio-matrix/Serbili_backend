@@ -62,6 +62,31 @@ const deleteUser = asyncWrapper(async (req, res) => {
 
     res.status(StatusCodes.OK).json({ message: "User deleted successfully" });
 });
+// accepet or decline user request
+
+const acceptOrDeclineUserRequest = asyncWrapper(async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; // 'accepted' or 'declined'
+
+    const user = await db.Users.findOne({ where: { id } });
+
+    if (!user) {
+        throw new NotFoundError("User not found");
+    }
+
+    if (status === 'accepted') {
+        user.isPaperVerified = true;
+    } else if (status === 'declined') {
+        user.isPaperVerified = false;
+    } else {
+        throw new BadRequestError("Invalid status value");
+    }
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ message: `User ${status} successfully` });
+}
+);
 
 
 module.exports = {

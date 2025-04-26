@@ -30,7 +30,7 @@ const verifyOTP = asyncWrapper(async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', 
         sameSite: 'Strict',
-        maxAge: process.env.COOKIE_AGE, // 15 minutes expiration
+        maxAge: process.env.COOKIE_AGE, 
     });
     
     

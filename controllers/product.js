@@ -68,12 +68,23 @@ const deleteProduct = asyncWrapper(async (req, res) => {
     }
     return res.status(StatusCodes.OK).json({msg: 'Product deleted successfully'})
 });
+// hadi ta3 l shops yjib l products ta3 warehouse 
 
+const getProductsByWarehouseForShops = asyncWrapper(async (req, res) => {
+    const { id: warehouseId } = req.params;
+    const products = await db.Product.findAll({ where: { warehouseId } });
+    
+    if (!products) {
+        throw new NotFoundError('No products found for this warehouse');
+    }
+    return res.status(StatusCodes.OK).json({products})
+})
 module.exports = {
     getAllProducts,
     getProduct,
     createProduct,
     updateProduct,
     deleteProduct,
-    getProductsByWarehouse
+    getProductsByWarehouse,
+    getProductsByWarehouseForShops
 }

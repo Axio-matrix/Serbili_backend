@@ -110,7 +110,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       allowNull:true,
     },
-
+    isPaperVerified:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     
   }, {
     sequelize,
