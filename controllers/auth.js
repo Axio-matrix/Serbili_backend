@@ -106,12 +106,13 @@ const login = asyncWrapper(async (req, res) => {
     throw new UnauthenticatedError("Invalid credentials");
   }
   const accessToken = await user.generateAccessToken();
-  const refreshToken = await db.refreshToken.generateToken(user.id);
+  const refreshTokenDb = await db.refreshToken.generateToken(user.id);
+  const refreshToken = refreshTokenDb.token;
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // Use secure cookies in production
     sameSite: "Strict",
-    maxAge: process.env.COOKIE_AGE, // 15 minutes (same as access token expiration)
+    maxAge: process.env.COOKIE_AGE, // 
   });
   
   return res.status(200).json({
@@ -132,7 +133,7 @@ const logout = asyncWrapper(async (req, res) => {
   }
   await db.refreshToken.deleteToken(tokenRefresh, storedToken.userId);
 
-  res.clearCookie("accessToken", {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
