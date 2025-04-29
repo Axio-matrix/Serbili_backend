@@ -11,7 +11,7 @@ const {
 } = require("../controllers/product");
 const authentication = require("../middlewares/authentication");
 const authorizeRoles = require("../middlewares/authorizeRoles");
-const auths = [authentication, authorizeRoles("warehouse ", "admin")];
+const auths = [authentication, authorizeRoles("warehouse", "admin")];
 router
   .route("/")
   .get(

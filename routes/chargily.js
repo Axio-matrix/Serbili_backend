@@ -46,6 +46,11 @@ router.post('/', express.json({
         orderId,
         message: 'An order has been marked as paid!',
       });
+      await db.Notification.create({
+        userId: order.warehouseId,
+        message: `Order #${orderId} has been marked as paid!`,
+        isRead: false,
+      });
 
       // Now send the response to confirm the webhook was processed successfully
       return res.sendStatus(200); // Successfully handled the webhook

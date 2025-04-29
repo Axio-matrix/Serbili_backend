@@ -43,7 +43,11 @@ const updateOrderStatus = asyncWrapper(async (req, res) => {
     updatedAt: new Date(),
     message: `Your order #${order.id} has been updated to ${order.status}`,
   });
-
+  await db.Notification.create({
+    userId: order.userId,
+    message: `Your order #${order.id} has been updated to ${order.status}`,
+    isRead: false,
+  });
   return res
     .status(StatusCodes.OK)
     .json({ msg: "Order status updated", order });
@@ -73,6 +77,11 @@ const notifyWarehouseOrderReceived = asyncWrapper(async (req, res) => {
       updatedAt: new Date(),
       message: `Shop has confirmed receipt of order #${order.id}`,
     });
+    await db.Notification.create({
+      userId: order.warehouse.id,
+      message: `Shop has confirmed receipt of order #${order.id}`,
+      isRead: false,
+    });
   }
 
   // Optional: Auto-mark as DELIVERED by system
@@ -85,6 +94,11 @@ const notifyWarehouseOrderReceived = asyncWrapper(async (req, res) => {
     status: "DELIVERED",
     updatedAt: new Date(),
     message: `Your order #${order.id} has been marked as DELIVERED`,
+  });
+  await db.Notification.create({
+    userId: order.userId,
+    message: `Your order #${order.id} has been marked as DELIVERED`,
+    isRead: false,
   });
 
   return res.status(StatusCodes.OK).json({

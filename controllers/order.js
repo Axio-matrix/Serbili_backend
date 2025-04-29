@@ -92,7 +92,10 @@ const placeOrder = asyncWrapper(async (req, res) => {
           remainingStock: product.stock,
           message: `Low stock alert: ${product.name} only has ${product.stock} left!`,
         });
-
+        await db.Notification.create({
+          userId: product.warehouseId,
+          message: `Low stock alert: ${product.name} only has ${product.stock} left!`,
+        });
         console.log(
           `📉 Low stock notification sent for ${product.name} (warehouse: ${product.warehouseId})`
         );
@@ -119,14 +122,18 @@ const placeOrder = asyncWrapper(async (req, res) => {
     }
 
     const io = req.app.get("io");
+    const message = "A new order has been placed for your warehouse!";
     io.to(`user_${warehouseId}`).emit("new-order", {
       orderId: order.id,
       userId,
       totalAmount,
       createdAt: order.createdAt,
-      message: "A new order has been placed for your warehouse!",
+      message,
     });
-
+    await db.Notification.create({
+      userId: warehouseId,
+      message,
+    });
     return res
       .status(StatusCodes.CREATED)
       .json(

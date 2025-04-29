@@ -48,6 +48,7 @@ const trackingWarehouseRouter = require('./routes/tracking');
 const chargilyRoutes = require('./routes/chargily');
 const filteringRouter = require('./routes/filtering');
 const adminRouter = require('./routes/admin');
+const notificationRouter = require('./routes/notification');
 
 //
 app.use(helmet()); // Adds secure headers
@@ -64,7 +65,11 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use('/webhook', chargilyRoutes);
-app.use(express.json());
+app.use(express.json(
+  {
+    limit: '10mb',
+  }
+));
 //routes
 app.use('/products', productsRouter);
 app.use('/cart', cartRouter);
@@ -77,6 +82,7 @@ app.use('/warehouseReviews', warehouseReviewsRouter);
 app.use('/tracking', trackingWarehouseRouter);
 app.use('/filtering', filteringRouter);
 app.use('/admin', adminRouter);
+app.use('/notifications', notificationRouter);
 
 //image access 
 app.use('/uploads', express.static('uploads'));
