@@ -6,6 +6,8 @@ const {
   getProfile,
   dashboardStats,
   getWarehouseProductStats,
+  getNetSalesPerMonth,
+  getSalesPerProduct
 } = require("../controllers/profile");
 const authentication = require("../middlewares/authentication");
 const authorizeRoles = require("../middlewares/authorizeRoles");
@@ -17,6 +19,14 @@ router
 router
   .route("/dashboard-stats")
   .get(authentication, authorizeRoles("warehouse"), dashboardStats);
+router.route("/net-sales-per-month").get(
+  authentication,
+  authorizeRoles("warehouse"),
+  getNetSalesPerMonth
+);
+router
+  .route("/sales-per-product")
+  .get(authentication, authorizeRoles("warehouse"), getSalesPerProduct);
 router
   .route("/upload-profile-image")
   .post(

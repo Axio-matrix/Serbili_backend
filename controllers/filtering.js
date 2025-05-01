@@ -10,7 +10,7 @@ const { Op } = require("sequelize");
 const { StatusCodes } = require("http-status-codes");
 
 const getNearbyWarehouses = asyncWrapper(async (req, res) => {
-  const { radius = 20 } = req.query; // radius in km
+  const { radius = 200 } = req.query; // radius in km
   const { latitude: shopLat, longitude: shopLng } = req.user; // Assuming the shop's location is stored in the user object
   if (!shopLat || !shopLng) {
     throw new BadRequestError(

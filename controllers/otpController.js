@@ -17,8 +17,8 @@ const verifyOTP = asyncWrapper(async (req, res) => {
     }
     
     if ( !user.otpCode || user.otpCode !== otp || new Date() > user.otpExpiresAt) {
-        // throw new UnauthenticatedError('Invalid or expired OTP');
-        res.json({message: 'invalid or expired otp'});
+        throw new UnauthenticatedError('Invalid or expired OTP');
+        // res.json({message: 'invalid or expired otp'});
     }
     
     await user.update({ isVerified: true, otpCode: null, otpExpiresAt: null });
