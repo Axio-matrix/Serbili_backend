@@ -216,6 +216,7 @@ const getOrdersDetails = asyncWrapper(async (req, res) => {
           "firstname",
           "lastname",
           "email",
+          "phoneNumber",
           "category",
           "address",
           "profileImage",

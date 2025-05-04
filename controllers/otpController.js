@@ -1,6 +1,7 @@
 const db = require("../db/models/index")
 const { BadRequestError, UnauthenticatedError,ForbiddenError , NotFoundError} = require('../errors');
 require('dotenv').config();
+const { StatusCodes } = require('http-status-codes');
 const asyncWrapper = require("../middlewares/async")
 const verifyOTP = asyncWrapper(async (req, res) => {
     const { userId, otp } = req.body;
@@ -35,7 +36,8 @@ const verifyOTP = asyncWrapper(async (req, res) => {
     });
     
     
-    return res.status(200).json({
+    
+    return res.status(StatusCodes.OK).json({
         msg: 'OTP verified successfully',
         accessToken,
     });
