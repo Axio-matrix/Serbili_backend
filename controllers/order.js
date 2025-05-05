@@ -14,8 +14,7 @@ const placeOrder = asyncWrapper(async (req, res) => {
   const { id: userId, email, firstname, lastname, phoneNumber } = req.user;
   const {  paymentMethod } = req.body;
   const name = `${firstname} ${lastname}`;
-  const address = req.user.address;
-
+  const user = req.user;
   if (!["credit_card", "cash_on_delivery"].includes(paymentMethod)) {
     throw new BadRequestError("Invalid payment method");
   }
@@ -114,6 +113,7 @@ const placeOrder = asyncWrapper(async (req, res) => {
         phone: phoneNumber,
         orderId: order.id, // you need it here
         items: checkoutItems,
+        
       });
 
       if (!payment || !payment.checkout_url) {
@@ -129,6 +129,7 @@ const placeOrder = asyncWrapper(async (req, res) => {
       totalAmount,
       createdAt: order.createdAt,
       message,
+      user,
     });
     await db.Notification.create({
       userId: warehouseId,

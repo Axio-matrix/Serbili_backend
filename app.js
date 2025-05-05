@@ -96,7 +96,7 @@ app.get('/test-socket', (req, res) => {
     createdAt: new Date(),
     message: '🧪 Test Order Notification',
   };
-  io.to('user_42').emit('order-received-by-shop', testData);
+  io.to('user_42').emit('new-order', testData);
   console.log('📤 Test order emitted to user_37');
   res.send('Test order emitted!');
 });
